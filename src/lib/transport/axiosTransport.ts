@@ -12,7 +12,11 @@ export class AxiosTransport extends Axon.AClientTransport {
         this.path = path;
 
         this.axiosClient = Axios.create({
-            baseURL: path
+            baseURL: path,
+            auth: {
+                username: 'test',
+                password: '123abc'
+            }
         });
     }
 
@@ -38,8 +42,8 @@ export class AxiosTransport extends Axon.AClientTransport {
         const service = message.metadata.get('service').toString('utf8');
         const action = message.metadata.get('action').toString('utf8');
 
-        const response = await this.axiosClient.post(`/sendTagged?mid=${messageId}&service=${service}&action=${action}`, {
-            messageId,
+        const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}&service=${service}&action=${action}`, {
+            // messageId,
             payload: message.payload.toString('base64'),
             metadata: message.metadata.frames.map(frame => ({
                 id: frame.id,
@@ -62,8 +66,8 @@ export class AxiosTransport extends Axon.AClientTransport {
         return message;
     }
     public async receiveTagged(messageId: string) {
-        const response = await this.axiosClient.post(`/receiveTagged?mid=${messageId}`, {
-            messageId
+        const response = await this.axiosClient.post(`/receive-tagged?mid=${messageId}`, {
+            // messageId
         });
         const { payload, metadata } = response.data;
 
