@@ -1,6 +1,8 @@
 import * as Axon from '@jlekie/axon';
 import { default as Axios, AxiosInstance } from 'axios';
 
+import * as Https from 'https';
+
 export class AxiosTransport extends Axon.AClientTransport {
     public readonly path: string;
 
@@ -16,7 +18,10 @@ export class AxiosTransport extends Axon.AClientTransport {
             auth: {
                 username: 'test',
                 password: '123abc'
-            }
+            },
+            httpsAgent: new Https.Agent({
+                rejectUnauthorized: false
+            })
         });
     }
 
