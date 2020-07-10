@@ -1,6 +1,6 @@
 {
   "name": "@jlekie/axon-axios",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Joe Lekie",
@@ -18,7 +18,7 @@
     "typescript": "3.6.3"
   },
   "dependencies": {
-    "@jlekie/axon": "1.0.0-alpha.1",
+    "@jlekie/axon": "1.0.0-alpha.3",
     "axios": "0.19.2",
     "uuid": "3.3.3"
   },
