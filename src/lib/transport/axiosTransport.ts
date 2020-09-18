@@ -44,10 +44,12 @@ export class AxiosTransport extends Axon.AClientTransport {
     public async sendTagged(messageId: string, message: Axon.TransportMessage) {
         this.messageSentEvent.emit(message);
 
-        const service = message.metadata.get('service').toString('utf8');
-        const action = message.metadata.get('action').toString('utf8');
+        // const service = message.metadata.get('service').toString('utf8');
+        // const action = message.metadata.get('action').toString('utf8');
+        // const serviceIdentifier = message.metadata.get('serviceIdentifier').toString('utf8');
 
-        const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}&service=${service}&action=${action}`, {
+        // const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}&service=${service}&action=${action}&serviceIdentifier=${serviceIdentifier}`, {
+        const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}`, {
             // messageId,
             payload: message.payload.toString('base64'),
             metadata: message.metadata.frames.map(frame => ({
