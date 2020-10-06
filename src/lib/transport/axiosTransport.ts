@@ -3,15 +3,18 @@ import { default as Axios, AxiosInstance } from 'axios';
 
 import * as Https from 'https';
 
+export type AxiosTransportOptions = Partial<Pick<AxiosTransport, 'waitForSendAcknowledgement'>>;
 export class AxiosTransport extends Axon.AClientTransport {
     public readonly path: string;
+    public readonly waitForSendAcknowledgement: boolean;
 
     private readonly axiosClient: AxiosInstance;
 
-    public constructor(path: string) {
+    public constructor(path: string, { waitForSendAcknowledgement = true }: AxiosTransportOptions = {}) {
         super();
 
         this.path = path;
+        this.waitForSendAcknowledgement = waitForSendAcknowledgement;
 
         this.axiosClient = Axios.create({
             baseURL: path,
@@ -33,13 +36,24 @@ export class AxiosTransport extends Axon.AClientTransport {
     public async send(message: Axon.TransportMessage) {
         this.messageSentEvent.emit(message);
 
-        const response = await this.axiosClient.post('/send', {
-            payload: message.payload.toString('base64'),
-            metadata: message.metadata.frames.map(frame => ({
-                id: frame.id,
-                data: frame.data.toString('base64')
-            }))
-        });
+        if (this.waitForSendAcknowledgement) {
+            const response = await this.axiosClient.post('/send', {
+                payload: message.payload.toString('base64'),
+                metadata: message.metadata.frames.map(frame => ({
+                    id: frame.id,
+                    data: frame.data.toString('base64')
+                }))
+            });
+        }
+        else {
+            this.axiosClient.post('/send', {
+                payload: message.payload.toString('base64'),
+                metadata: message.metadata.frames.map(frame => ({
+                    id: frame.id,
+                    data: frame.data.toString('base64')
+                }))
+            });
+        }
     }
     public async sendTagged(messageId: string, message: Axon.TransportMessage) {
         this.messageSentEvent.emit(message);
@@ -49,14 +63,26 @@ export class AxiosTransport extends Axon.AClientTransport {
         // const serviceIdentifier = message.metadata.get('serviceIdentifier').toString('utf8');
 
         // const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}&service=${service}&action=${action}&serviceIdentifier=${serviceIdentifier}`, {
-        const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}`, {
-            // messageId,
-            payload: message.payload.toString('base64'),
-            metadata: message.metadata.frames.map(frame => ({
-                id: frame.id,
-                data: frame.data.toString('base64')
-            }))
-        });
+        if (this.waitForSendAcknowledgement) {
+            const response = await this.axiosClient.post(`/send-tagged?mid=${messageId}`, {
+                // messageId,
+                payload: message.payload.toString('base64'),
+                metadata: message.metadata.frames.map(frame => ({
+                    id: frame.id,
+                    data: frame.data.toString('base64')
+                }))
+            });
+        }
+        else {
+            this.axiosClient.post(`/send-tagged?mid=${messageId}`, {
+                // messageId,
+                payload: message.payload.toString('base64'),
+                metadata: message.metadata.frames.map(frame => ({
+                    id: frame.id,
+                    data: frame.data.toString('base64')
+                }))
+            });
+        }
     }
 
     public async receive() {
